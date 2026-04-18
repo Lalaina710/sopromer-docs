@@ -661,23 +661,39 @@ Mot de passe SSH: ********
         </div>
     </div>
 
-    <!-- 7. Puppeteer E2E -->
+    <!-- 7. Tests E2E -->
     <div class="section" id="puppeteer">
-        <h2><span class="num">7</span> Tests E2E Puppeteer <span class="tag tag-new">nouveau</span></h2>
+        <h2><span class="num">7</span> Tests E2E — Playwright &amp; Puppeteer <span class="tag tag-new">nouveau</span></h2>
 
-        <p>Tests navigateur automatisés pour valider l'UI, les composants OWL/JS, le POS — tout ce que XML-RPC ne peut pas couvrir.</p>
+        <p>Tests navigateur automatisés pour valider l'UI, composants OWL/JS, POS — tout ce que XML-RPC ne peut pas couvrir.</p>
 
         <div class="info-box danger">
-            <strong>RESTRICTION ABSOLUE : Puppeteer = serveur 45 (test) UNIQUEMENT.</strong>
-            Jamais sur 43 (prod) ni odoo.sopromer.mg. Le <code>config.js</code> bloque automatiquement toute tentative vers la prod (process.exit(1)).
+            <strong>RESTRICTION ABSOLUE : Tests E2E = serveur 45 (test) UNIQUEMENT.</strong>
+            Jamais sur 43 (prod) ni odoo.sopromer.mg. Les <code>config.py</code> / <code>config.js</code> bloquent automatiquement toute tentative vers la prod.
         </div>
 
-        <h3>Quand utiliser Puppeteer vs XML-RPC</h3>
+        <h3>Playwright vs Puppeteer</h3>
+
+        <table>
+            <tr><th></th><th>Playwright Python <span class="tag ok">PRÉFÉRÉ</span></th><th>Puppeteer Node.js <span class="tag warn">LEGACY</span></th></tr>
+            <tr><td>Langage</td><td><strong>Python</strong> (même qu'Odoo)</td><td>JavaScript</td></tr>
+            <tr><td>Attente éléments</td><td><strong>Auto-wait</strong> intégré</td><td>Manuel (<code>delay(2000)</code>) — flaky</td></tr>
+            <tr><td>Sélecteurs</td><td><strong>Par texte</strong> : <code>page.get_by_role("button", name="Confirmer")</code></td><td>CSS : <code>page.$('.o_btn')</code></td></tr>
+            <tr><td>Helpers Odoo</td><td><code>fill_many2one</code>, <code>click_status_bar</code>, <code>rpc_call</code></td><td>Basiques (login, navigate, screenshot)</td></tr>
+            <tr><td>Debug</td><td><strong>Trace viewer</strong> (vidéo + réseau + DOM)</td><td>Screenshots uniquement</td></tr>
+            <tr><td>Stabilité</td><td><strong>Très stable</strong></td><td>Tests flaky fréquents (timing)</td></tr>
+        </table>
+
+        <div class="info-box tip">
+            <strong>Règle :</strong> Tout nouveau test = <strong>Playwright Python</strong>. Puppeteer reste pour les tests existants.
+        </div>
+
+        <h3>Quand utiliser tests E2E vs XML-RPC</h3>
         <table>
             <tr><th>Besoin</th><th>Outil</th></tr>
-            <tr><td>UI, boutons custom, widgets JS/OWL</td><td style="color: var(--green); font-weight: 700;">Puppeteer</td></tr>
-            <tr><td>POS (caisse, paiement, ticket)</td><td style="color: var(--green); font-weight: 700;">Puppeteer (seul moyen)</td></tr>
-            <tr><td>Dashboards, rendu visuel</td><td style="color: var(--green); font-weight: 700;">Puppeteer</td></tr>
+            <tr><td>UI, boutons custom, widgets JS/OWL</td><td style="color: var(--green); font-weight: 700;">Playwright</td></tr>
+            <tr><td>POS (caisse, paiement, ticket)</td><td style="color: var(--green); font-weight: 700;">Playwright (seul moyen)</td></tr>
+            <tr><td>Dashboards, rendu visuel</td><td style="color: var(--green); font-weight: 700;">Playwright</td></tr>
             <tr><td>Data, workflows, calculs ORM</td><td style="color: var(--blue); font-weight: 700;">XML-RPC / Shell</td></tr>
             <tr><td>Droits d'accès</td><td style="color: var(--blue); font-weight: 700;">XML-RPC</td></tr>
         </table>
@@ -701,10 +717,10 @@ Mot de passe SSH: ********
 
         <table>
             <tr><th>Situation</th><th>Mode</th><th>Commande</th></tr>
-            <tr><td>Écrire un nouveau test</td><td><strong>Visuel + SLOW_MO</strong></td><td><code>HEADLESS=false SLOW_MO=100 node ...</code></td></tr>
-            <tr><td>Test échoue, debug</td><td><strong>Visuel</strong></td><td><code>HEADLESS=false node ...</code></td></tr>
-            <tr><td>Test validé, routine</td><td><strong>Headless</strong></td><td><code>node ...</code></td></tr>
-            <tr><td>Batch tous les modules</td><td><strong>Headless</strong></td><td><code>for f in puppeteer-tests/test-*.js; do node "$f"; done</code></td></tr>
+            <tr><td>Écrire un nouveau test</td><td><strong>Visuel + SLOW_MO</strong></td><td><code>HEADLESS=false SLOW_MO=100 python ...</code></td></tr>
+            <tr><td>Test échoue, debug</td><td><strong>Visuel</strong></td><td><code>HEADLESS=false python ...</code></td></tr>
+            <tr><td>Test validé, routine</td><td><strong>Headless</strong></td><td><code>python ...</code></td></tr>
+            <tr><td>Batch tous les tests</td><td><strong>Headless</strong></td><td><code>python run.py</code></td></tr>
             <tr><td>Montrer un bug</td><td><strong>Visuel</strong></td><td>Voir le problème en direct</td></tr>
             <tr><td>Tester POS première fois</td><td><strong>Visuel + SLOW_MO</strong></td><td>Beaucoup d'interactions UI</td></tr>
         </table>
@@ -714,39 +730,88 @@ Mot de passe SSH: ********
         </div>
 
         <h3>Structure des fichiers</h3>
-<pre><code>puppeteer-tests/
-├── config.js          <span class="comment">← connexion + guard anti-prod</span>
-├── helpers.js         <span class="comment">← launch(), login(), navigateMenu(), screenshot()</span>
-├── test-module.js     <span class="comment">← smoke test générique</span>
-├── test-&lt;module&gt;.js   <span class="comment">← tests spécifiques par module</span>
-└── screenshots/       <span class="comment">← captures auto horodatées</span></code></pre>
+<pre><code>playwright-tests/                      <span class="comment">← NOUVEAU (Python, préféré)</span>
+├── config.py          <span class="comment">← connexion + guard anti-prod</span>
+├── helpers.py         <span class="comment">← 11 helpers adaptés Odoo (auto-wait)</span>
+├── test_module.py     <span class="comment">← smoke test générique</span>
+├── test_sale_flow.py  <span class="comment">← flux vente E2E complet</span>
+├── run.py             <span class="comment">← batch runner</span>
+└── screenshots/
+
+puppeteer-tests/                       <span class="comment">← LEGACY (Node.js)</span>
+├── config.js / helpers.js / test-module.js
+└── screenshots/</code></pre>
+
+        <h3>Helpers Playwright Python</h3>
+        <table>
+            <tr><th>Helper</th><th>Description</th><th>Équivalent Puppeteer</th></tr>
+            <tr><td><code>launch()</code></td><td>Ouvre navigateur 1920x1080</td><td><code>launch()</code></td></tr>
+            <tr><td><code>login(page)</code></td><td>Auth JSON-RPC</td><td><code>login(page)</code></td></tr>
+            <tr><td><code>navigate_menu(page, 'Ventes', 'Commandes')</code></td><td>Navigation par texte, <strong>auto-wait</strong></td><td><code>navigateMenu(page, ...)</code> + delay</td></tr>
+            <tr><td><code>screenshot(page, 'nom')</code></td><td>Capture horodatée</td><td><code>screenshot(page, 'nom')</code></td></tr>
+            <tr><td><code>rpc_call(page, model, method)</code></td><td>Appel JSON-RPC</td><td><code>page.evaluate(...)</code></td></tr>
+            <tr><td><code>fill_many2one(page, 'partner_id', 'CLIENT')</code></td><td>Remplir champ Many2one Odoo</td><td>—</td></tr>
+            <tr><td><code>fill_field(page, 'qty', '5')</code></td><td>Remplir champ texte/nombre</td><td>—</td></tr>
+            <tr><td><code>click_button(page, 'Confirmer')</code></td><td>Cliquer bouton par texte</td><td>—</td></tr>
+            <tr><td><code>click_status_bar(page, 'Valider')</code></td><td>Bouton status bar Odoo</td><td>—</td></tr>
+            <tr><td><code>check_element(page, '.css', 'desc')</code></td><td>Vérifie élément avec expect()</td><td>—</td></tr>
+        </table>
 
         <h3>Commandes</h3>
-<pre><code><span class="comment"># Smoke test d'un module (headless)</span>
-<span class="cmd">node</span> <span class="string">puppeteer-tests/test-module.js</span> <span class="flag">pos_dashboard</span> <span class="string">"Point de Vente"</span>
+<pre><code><span class="comment"># ── Playwright Python (préféré) ──</span>
+<span class="cmd">cd</span> <span class="string">playwright-tests</span>
+
+<span class="comment"># Smoke test module</span>
+<span class="cmd">python</span> <span class="string">test_module.py</span> <span class="flag">pos_dashboard</span> <span class="string">"Point de Vente"</span>
+
+<span class="comment"># Flux vente complet</span>
+<span class="cmd">python</span> <span class="string">test_sale_flow.py</span>
 
 <span class="comment"># Dev : visuel + ralenti</span>
-<span class="cmd">HEADLESS=false SLOW_MO=100</span> <span class="cmd">node</span> <span class="string">puppeteer-tests/test-pos.js</span>
+<span class="cmd">HEADLESS=false SLOW_MO=100</span> <span class="cmd">python</span> <span class="string">test_sale_flow.py</span>
 
-<span class="comment"># Batch (headless)</span>
-<span class="cmd">for</span> f <span class="cmd">in</span> <span class="string">puppeteer-tests/test-*.js</span>; <span class="cmd">do</span> node "$f"; <span class="cmd">done</span>
+<span class="comment"># Batch tous les tests</span>
+<span class="cmd">python</span> <span class="string">run.py</span>
 
-<span class="comment"># npm scripts</span>
+<span class="comment"># ── Puppeteer Node.js (legacy) ──</span>
+<span class="cmd">node</span> <span class="string">puppeteer-tests/test-module.js</span> <span class="flag">pos_dashboard</span> <span class="string">"Point de Vente"</span>
 <span class="cmd">npm test</span>                    <span class="comment"># headless</span>
-<span class="cmd">npm run test:live</span>           <span class="comment"># visuel</span>
-<span class="cmd">npm run test:slow</span>           <span class="comment"># visuel + ralenti</span></code></pre>
+<span class="cmd">npm run test:live</span>           <span class="comment"># visuel</span></code></pre>
+
+        <h3>Exemple : test flux vente (Playwright)</h3>
+<pre><code><span class="comment"># test_sale_flow.py — auto-wait, pas de delay()</span>
+<span class="cmd">from</span> helpers <span class="cmd">import</span> launch, login, goto, screenshot, fill_many2one, click_status_bar
+<span class="cmd">from</span> playwright.sync_api <span class="cmd">import</span> expect
+
+pw, browser, page = launch()
+login(page)
+goto(page, <span class="string">"/odoo/sales/new"</span>)
+
+<span class="comment"># Remplir le formulaire — auto-wait intégré</span>
+fill_many2one(page, <span class="string">"partner_id"</span>, <span class="string">"client"</span>)
+click_status_bar(page, <span class="string">"Confirmer"</span>)
+expect(page.locator(<span class="string">".o_statusbar_status"</span>)).to_contain_text(<span class="string">"Bon de commande"</span>)
+screenshot(page, <span class="string">"sale_confirmed"</span>)</code></pre>
 
         <h3>Agent concerné</h3>
-        <p>L'agent <code>odoo-tester</code> est configuré pour utiliser Puppeteer. Il choisit automatiquement le bon mode (visuel pour dev, headless pour routine).</p>
+        <p>L'agent <code>odoo-tester</code> utilise Playwright Python pour les nouveaux tests, Puppeteer pour les tests existants. Il choisit automatiquement le bon mode (visuel pour dev, headless pour routine).</p>
 
-        <h3>Sécurité config.js</h3>
+        <h3>Sécurité — Guard anti-prod</h3>
         <table>
-            <tr><th>Paramètre</th><th>Valeur</th></tr>
-            <tr><td>URL par défaut</td><td><code>http://192.73.0.45:8069</code></td></tr>
-            <tr><td>Hôtes autorisés</td><td><code>localhost</code>, <code>127.0.0.1</code>, <code>192.73.0.45</code></td></tr>
-            <tr><td>Hôtes bloqués</td><td><code>192.73.0.43</code>, <code>odoo.sopromer.mg</code></td></tr>
-            <tr><td>Si prod détecté</td><td><code>process.exit(1)</code> immédiat</td></tr>
+            <tr><th>Paramètre</th><th>Playwright (<code>config.py</code>)</th><th>Puppeteer (<code>config.js</code>)</th></tr>
+            <tr><td>URL par défaut</td><td colspan="2"><code>http://192.73.0.45:8069</code></td></tr>
+            <tr><td>Hôtes autorisés</td><td colspan="2"><code>localhost</code>, <code>127.0.0.1</code>, <code>192.73.0.45</code></td></tr>
+            <tr><td>Hôtes bloqués</td><td colspan="2"><code>192.73.0.43</code>, <code>odoo.sopromer.mg</code></td></tr>
+            <tr><td>Si prod détecté</td><td><code>sys.exit(1)</code></td><td><code>process.exit(1)</code></td></tr>
         </table>
+
+        <h3>Installation</h3>
+<pre><code><span class="comment"># Playwright Python (une seule fois)</span>
+<span class="cmd">pip install --user playwright</span>
+<span class="cmd">python -m playwright install chromium</span>
+
+<span class="comment"># Puppeteer Node.js (déjà installé)</span>
+<span class="cmd">npm install</span>   <span class="comment"># dans custom-addons/</span></code></pre>
     </div>
 
     <!-- 8. CI/CD -->
@@ -973,12 +1038,17 @@ Mot de passe SSH: ********
 │       ├── fix_bc2600266.py
 │       ├── fix_date_filters_tz.py
 │       └── rapport_*.html
-├── puppeteer-tests/
-│   ├── config.js                      <span class="comment">← connexion + guard anti-prod</span>
-│   ├── helpers.js                     <span class="comment">← fonctions partagées</span>
-│   ├── test-module.js                 <span class="comment">← smoke test générique</span>
-│   └── screenshots/                   <span class="comment">← captures auto</span>
-├── package.json                       <span class="comment">← puppeteer + scripts npm</span>
+├── playwright-tests/                  <span class="comment">← NOUVEAU (Python, préféré)</span>
+│   ├── config.py                      <span class="comment">← connexion + guard anti-prod</span>
+│   ├── helpers.py                     <span class="comment">← 11 helpers Odoo (auto-wait)</span>
+│   ├── test_module.py                 <span class="comment">← smoke test générique</span>
+│   ├── test_sale_flow.py              <span class="comment">← flux vente E2E</span>
+│   ├── run.py                         <span class="comment">← batch runner</span>
+│   └── screenshots/
+├── puppeteer-tests/                   <span class="comment">← legacy (Node.js)</span>
+│   ├── config.js / helpers.js / test-module.js
+│   └── screenshots/
+├── package.json                       <span class="comment">← scripts npm (puppeteer + playwright)</span>
 ├── docs/
 │   └── guide-productivite-sopromer.html  <span class="comment">← ce guide</span>
 
