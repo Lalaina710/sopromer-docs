@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide Productivité SOPROMER — Claude Code + Odoo 18</title>
+    <style>
+        :root {
+            --primary: #714B67;
+            --primary-dark: #5a3c53;
+            --primary-light: #f3edf2;
+            --accent: #00A09D;
+            --accent-light: #e6f7f7;
+            --orange: #E97E00;
+            --orange-light: #fff5e6;
+            --red: #DC3545;
+            --red-light: #fde8ea;
+            --green: #28A745;
+            --green-light: #e8f5e9;
+            --blue: #0079C1;
+            --blue-light: #e6f2fa;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #2c2c2c;
+            --text-light: #6c757d;
+            --border: #e0e0e0;
+            --code-bg: #1e1e2e;
+            --code-text: #cdd6f4;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        .header .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Navigation */
+        .nav {
+            background: var(--card-bg);
+            border-bottom: 2px solid var(--primary);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .nav-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+        .nav a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .nav a:hover {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Sections */
+        .section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-left: 4px solid var(--primary);
+        }
+        .section h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .section h2 .num {
+            background: var(--primary);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .section h3 {
+            color: var(--primary-dark);
+            font-size: 1.15rem;
+            margin: 1.5rem 0 0.8rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .tag-auto { background: var(--green-light); color: var(--green); }
+        .tag-manual { background: var(--blue-light); color: var(--blue); }
+        .tag-critical { background: var(--red-light); color: var(--red); }
+        .tag-new { background: var(--orange-light); color: var(--orange); }
+
+        /* Code blocks */
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            margin: 0.8rem 0;
+            position: relative;
+        }
+        pre .comment { color: #6c7086; }
+        pre .cmd { color: #89b4fa; }
+        pre .flag { color: #f9e2af; }
+        pre .string { color: #a6e3a1; }
+        pre .output { color: #6c7086; font-style: italic; }
+
+        code {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.88em;
+        }
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.92rem;
+        }
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 0.7rem 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        tr:hover td { background: var(--primary-light); }
+        tr:last-child td { border-bottom: none; }
+
+        /* Info boxes */
+        .info-box {
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 0.92rem;
+        }
+        .info-box.tip { background: var(--green-light); border-left: 4px solid var(--green); }
+        .info-box.warning { background: var(--orange-light); border-left: 4px solid var(--orange); }
+        .info-box.danger { background: var(--red-light); border-left: 4px solid var(--red); }
+        .info-box.info { background: var(--blue-light); border-left: 4px solid var(--blue); }
+        .info-box strong { display: block; margin-bottom: 0.3rem; }
+
+        /* Steps */
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+        }
+        .steps li {
+            counter-increment: step;
+            padding: 0.8rem 0 0.8rem 3.5rem;
+            position: relative;
+            border-left: 2px solid var(--border);
+            margin-left: 1rem;
+        }
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: -14px;
+            top: 0.7rem;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .steps li:last-child { border-left-color: transparent; }
+        .steps li strong { color: var(--primary-dark); }
+
+        /* Flow diagram */
+        .flow {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+            justify-content: center;
+        }
+        .flow-step {
+            background: var(--primary-light);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            text-align: center;
+            min-width: 100px;
+        }
+        .flow-step.active {
+            background: var(--primary);
+            color: white;
+        }
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: var(--primary);
+            padding: 0 0.3rem;
+        }
+
+        /* Keyboard shortcuts */
+        kbd {
+            background: #eee;
+            border: 1px solid #ccc;
+            border-bottom: 2px solid #bbb;
+            border-radius: 4px;
+            padding: 0.1rem 0.4rem;
+            font-family: 'Cascadia Code', monospace;
+            font-size: 0.8em;
+        }
+
+        /* Summary cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .summary-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .summary-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(113,75,103,0.15);
+        }
+        .summary-card .metric {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .summary-card .label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.3rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.6rem; }
+            .container { padding: 1rem; }
+            .section { padding: 1.2rem; }
+            .flow { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Guide Productivité SOPROMER</h1>
+    <p>Claude Code + Odoo 18 — Configuration complète et mode d'emploi</p>
+    <span class="badge">Version 1.1 — 18 avril 2026</span>
+</div>
+
+<nav class="nav">
+    <div class="nav-inner">
+        <a href="#claudemd">CLAUDE.md</a>
+        <a href="#caveman">Caveman Mode</a>
+        <a href="#deploy">Deploy.sh</a>
+        <a href="#hook">Hook Ruff</a>
+        <a href="#pilot">Orchestrateur</a>
+        <a href="#agents">Agents</a>
+        <a href="#puppeteer">Puppeteer E2E</a>
+        <a href="#ci">CI/CD</a>
+        <a href="#versions">Versions</a>
+        <a href="#memoires">Mémoires</a>
+        <a href="#workflow">Workflow Quotidien</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- Résumé gains -->
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="metric">-26%</div>
+            <div class="label">Tokens input / session</div>
+        </div>
+        <div class="summary-card">
+            <div class="metric">-65%</div>
+            <div class="label">Tokens output (caveman)</div>
+        </div>
+        <div class="summary-card">
+            <div class="metric">1 cmd</div>
+            <div class="label">Déploiement module</div>
+        </div>
+        <div class="summary-card">
+            <div class="metric">16</div>
+            <div class="label">Agents + Skills</div>
+        </div>
+    </div>
+
+    <!-- 1. CLAUDE.md -->
+    <div class="section" id="claudemd">
+        <h2><span class="num">1</span> CLAUDE.md <span class="tag tag-auto">automatique</span></h2>
+
+        <p>Fichier d'instructions chargé automatiquement quand tu ouvres Claude Code dans <code>C:\odoo18\custom-addons\</code>.</p>
+
+        <div class="info-box tip">
+            <strong>Tu n'as rien à faire.</strong>
+            Claude connaît automatiquement : les serveurs (43=prod, 45=test), les conventions de code, les agents disponibles, les règles du projet.
+        </div>
+
+        <h3>Contenu</h3>
+        <table>
+            <tr><th>Section</th><th>Ce que Claude sait</th></tr>
+            <tr><td>Projet</td><td>SOPROMER, IPs serveurs, GitHub Lalaina710</td></tr>
+            <tr><td>Conventions</td><td>Structure module, Python, XML, OWL 2, manifeste</td></tr>
+            <tr><td>Workflow</td><td>Pas de restart prod en journée, tester sur 45 d'abord</td></tr>
+            <tr><td>Agents</td><td>15 agents avec leurs skills associés</td></tr>
+            <tr><td>Modules</td><td>Custom (27) + tiers (6) installés</td></tr>
+        </table>
+
+        <h3>Fichiers</h3>
+        <table>
+            <tr><th>Fichier</th><th>Rôle</th></tr>
+            <tr><td><code>CLAUDE.md</code></td><td>Version compressée active (5.5 KB, -18%)</td></tr>
+            <tr><td><code>CLAUDE.original.md</code></td><td>Backup version originale (6.7 KB)</td></tr>
+        </table>
+    </div>
+
+    <!-- 2. Caveman -->
+    <div class="section" id="caveman">
+        <h2><span class="num">2</span> Caveman Mode <span class="tag tag-auto">automatique</span></h2>
+
+        <p>Compresse les réponses de Claude (~65% tokens en moins). Activé par défaut à chaque session.</p>
+
+        <h3>Commandes</h3>
+        <table>
+            <tr><th>Commande</th><th>Effet</th></tr>
+            <tr><td><code>/caveman</code></td><td>Mode full (défaut) — fragments OK, articles supprimés</td></tr>
+            <tr><td><code>/caveman lite</code></td><td>Moins compressé — phrases complètes, juste le filler supprimé</td></tr>
+            <tr><td><code>/caveman ultra</code></td><td>Compression maximale — abréviations (DB, auth, fn, impl)</td></tr>
+            <tr><td><code>stop caveman</code></td><td>Revenir au mode normal verbose</td></tr>
+            <tr><td><code>/caveman-help</code></td><td>Carte de référence rapide</td></tr>
+            <tr><td><code>/caveman-commit</code></td><td>Message de commit ultra-court</td></tr>
+            <tr><td><code>/caveman-review</code></td><td>Review de code en 1 ligne par commentaire</td></tr>
+        </table>
+
+        <h3>Exemple</h3>
+        <table>
+            <tr><th>Mode</th><th>Réponse à "Pourquoi le composant re-render ?"</th></tr>
+            <tr><td>Normal</td><td>Le problème vient du fait que vous créez une nouvelle référence d'objet à chaque rendu. Je vous recommande d'utiliser useMemo pour mémoriser la valeur.</td></tr>
+            <tr><td>Full</td><td>New object ref each render. Inline object prop = new ref = re-render. Wrap in <code>useMemo</code>.</td></tr>
+            <tr><td>Ultra</td><td>Inline obj prop → new ref → re-render. <code>useMemo</code>.</td></tr>
+        </table>
+
+        <h3>Statusline</h3>
+        <p>Badge visible dans la barre de statut : <kbd>[CAVEMAN]</kbd> ou <kbd>[CAVEMAN:ULTRA]</kbd>. Configuré dans <code>~/.claude/settings.json</code>.</p>
+    </div>
+
+    <!-- 3. Deploy -->
+    <div class="section" id="deploy">
+        <h2><span class="num">3</span> Deploy.sh <span class="tag tag-manual">commande manuelle</span></h2>
+
+        <p>Déployer un module en 1 commande au lieu de copier fichier par fichier via SSH.</p>
+
+        <h3>Syntaxe</h3>
+<pre><code><span class="cmd">cd</span> <span class="string">/c/odoo18/custom-addons</span>
+<span class="cmd">./scripts/deploy.sh</span> <span class="flag">&lt;module&gt;</span> <span class="flag">&lt;45|43&gt;</span></code></pre>
+
+        <h3>Déployer sur TEST (serveur 45)</h3>
+<pre><code><span class="cmd">./scripts/deploy.sh</span> <span class="string">pos_dashboard</span> <span class="flag">45</span>
+
+<span class="output">[DEPLOY] Module: pos_dashboard (v18.0.2.1.0)
+[DEPLOY] Cible: TEST (192.73.0.45)
+Mot de passe SSH: ********
+[DEPLOY] Suppression ancien pos_dashboard...
+[DEPLOY] Copie pos_dashboard vers 192.73.0.45...
+[DEPLOY] Restart odoo-dev...
+[DEPLOY] Container status: Up 10 seconds
+[DEPLOY] ✅ pos_dashboard déployé et actif sur TEST</span></code></pre>
+
+        <div class="info-box tip">
+            <strong>Sur le serveur 45</strong>, le script redémarre automatiquement <code>odoo-dev</code> et vérifie que le container tourne.
+        </div>
+
+        <h3>Déployer sur PROD (serveur 43)</h3>
+<pre><code><span class="cmd">./scripts/deploy.sh</span> <span class="string">pos_dashboard</span> <span class="flag">43</span>
+
+<span class="output">[WARN] ⚠️ DÉPLOIEMENT PROD — le module sera copié SANS restart
+Continuer ? (y/N) y
+Mot de passe SSH: ********
+[DEPLOY] Copie pos_dashboard vers 192.73.0.43...
+[DEPLOY] ✅ pos_dashboard copié sur PROD
+[WARN] ⏰ CE SOIR — exécuter :
+  ssh odoo@192.73.0.43
+  docker restart odoo-dev</span></code></pre>
+
+        <div class="info-box danger">
+            <strong>JAMAIS de restart sur 43 pendant les heures de travail !</strong>
+            115 utilisateurs + 40 sessions PdV actives. Le script copie les fichiers mais ne redémarre PAS. Le restart est à faire le soir.
+        </div>
+
+        <h3>Après déploiement — Upgrader le module</h3>
+<pre><code><span class="comment"># Sur le serveur (via SSH)</span>
+<span class="cmd">docker exec</span> odoo-dev /opt/odoo/odoo-bin \
+  <span class="flag">-c</span> /etc/odoo/odoo.conf \
+  <span class="flag">-d</span> <span class="string">SOPROMER</span> \
+  <span class="flag">-u</span> <span class="string">pos_dashboard</span> \
+  <span class="flag">--stop-after-init</span></code></pre>
+
+        <h3>Historique des déploiements</h3>
+<pre><code><span class="cmd">cat</span> <span class="string">scripts/deploy.log</span>
+
+<span class="output">2026-04-18 14:30 | pos_dashboard v18.0.2.1.0 | TEST (192.73.0.45) | User
+2026-04-18 20:15 | pos_dashboard v18.0.2.1.0 | PROD (192.73.0.43) | User
+2026-04-19 09:00 | stock_movement_report v18.0.1.2.0 | TEST (192.73.0.45) | User</span></code></pre>
+
+        <h3>Ce que le script fait</h3>
+        <ol class="steps">
+            <li><strong>Vérifie</strong> que le module existe localement avec un <code>__manifest__.py</code></li>
+            <li><strong>Demande confirmation</strong> si c'est la PROD (43)</li>
+            <li><strong>Supprime</strong> l'ancien module sur le serveur</li>
+            <li><strong>Copie</strong> via tar+SSH (exclut <code>__pycache__</code>, <code>.git</code>, <code>node_modules</code>)</li>
+            <li><strong>Restart</strong> automatique si TEST (45), message "ce soir" si PROD (43)</li>
+            <li><strong>Met à jour</strong> <code>deployed_versions.json</code> et <code>deploy.log</code></li>
+        </ol>
+    </div>
+
+    <!-- 4. Hook Ruff -->
+    <div class="section" id="hook">
+        <h2><span class="num">4</span> Hook Ruff Lint <span class="tag tag-auto">automatique</span></h2>
+
+        <p>Chaque fois que Claude écrit ou modifie un fichier <code>.py</code>, ruff vérifie automatiquement la qualité du code.</p>
+
+        <div class="flow">
+            <div class="flow-step">Claude modifie<br><code>models/*.py</code></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step active">Hook ruff<br>se déclenche</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step" style="border-color: var(--green);">OK → continue</div>
+        </div>
+        <div class="flow">
+            <div class="flow-step">Claude modifie<br><code>models/*.py</code></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step active">Hook ruff<br>se déclenche</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step" style="border-color: var(--red);">Erreurs → Claude corrige</div>
+        </div>
+
+        <div class="info-box tip">
+            <strong>Tu n'as rien à faire.</strong>
+            Le hook est transparent. Si ruff trouve des erreurs, Claude les voit et corrige avant de continuer.
+        </div>
+
+        <h3>Désactiver (si besoin)</h3>
+        <p>Ouvrir <code>~/.claude/settings.json</code> et supprimer le bloc <code>"hooks"</code>.</p>
+
+        <h3>Configuration technique</h3>
+        <table>
+            <tr><th>Paramètre</th><th>Valeur</th></tr>
+            <tr><td>Event</td><td><code>PostToolUse</code></td></tr>
+            <tr><td>Matcher</td><td><code>Write|Edit</code></td></tr>
+            <tr><td>Script</td><td><code>~/.claude/hooks/ruff-lint.py</code></td></tr>
+            <tr><td>Timeout</td><td>15 secondes</td></tr>
+            <tr><td>Ruff path</td><td><code>C:\Users\User\AppData\Local\...\Scripts\ruff.exe</code></td></tr>
+        </table>
+    </div>
+
+    <!-- 5. Orchestrateur -->
+    <div class="section" id="pilot">
+        <h2><span class="num">5</span> Agent sopromer-pilot <span class="tag tag-new">nouveau</span></h2>
+
+        <p>Orchestrateur qui coordonne les agents spécialisés pour les tâches complexes. Il ne code pas — il dispatche.</p>
+
+        <h3>Quand l'utiliser</h3>
+        <table>
+            <tr><th>Situation</th><th>Utiliser le pilot ?</th></tr>
+            <tr><td>Nouveau module complet (backend + frontend)</td><td style="color: var(--green); font-weight: 700;">OUI</td></tr>
+            <tr><td>Bug complexe (POS + stock + compta)</td><td style="color: var(--green); font-weight: 700;">OUI</td></tr>
+            <tr><td>Migration de données</td><td style="color: var(--green); font-weight: 700;">OUI</td></tr>
+            <tr><td>Audit complet</td><td style="color: var(--green); font-weight: 700;">OUI</td></tr>
+            <tr><td>Petite modification dans 1 fichier</td><td style="color: var(--red); font-weight: 700;">NON — demande directement</td></tr>
+            <tr><td>Question simple</td><td style="color: var(--red); font-weight: 700;">NON — demande directement</td></tr>
+        </table>
+
+        <h3>Exemple : Nouveau module</h3>
+        <div class="flow">
+            <div class="flow-step">odoo-architect<br>scaffold + modèles</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">odoo-backend<br>+ odoo-frontend<br><small>(en parallèle)</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">code-reviewer<br>revue</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">odoo-qa<br>tests</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step active">deploy<br>45 → 43</div>
+        </div>
+
+        <h3>Exemple : Bugfix POS</h3>
+        <div class="flow">
+            <div class="flow-step">odoo-ops-diagnostic<br>investigation</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">odoo-frontend<br>ou odoo-backend<br>fix</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">odoo-tester<br>validation</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step active">deploy<br>45 → 43</div>
+        </div>
+    </div>
+
+    <!-- 6. Agents -->
+    <div class="section" id="agents">
+        <h2><span class="num">6</span> Agents spécialisés</h2>
+
+        <p>16 agents, chacun expert dans un domaine. Tu peux les demander explicitement ou laisser Claude choisir.</p>
+
+        <h3>Comment demander un agent</h3>
+<pre><code><span class="comment"># Exemples de demandes</span>
+<span class="string">"Utilise odoo-backend pour ajouter un champ sur sale.order"</span>
+<span class="string">"Lance odoo-frontend pour modifier la vue POS"</span>
+<span class="string">"Demande à odoo-ops-diagnostic de vérifier les stocks négatifs"</span></code></pre>
+
+        <h3>Tableau des agents</h3>
+        <table>
+            <tr><th>Tu veux...</th><th>Agent</th><th>Skill associé</th></tr>
+            <tr><td>Modifier logique Python / ORM</td><td><code>odoo-backend</code></td><td><code>odoo-business-logic</code></td></tr>
+            <tr><td>Modifier interface / POS / JS</td><td><code>odoo-frontend</code></td><td><code>odoo-owl-frontend</code></td></tr>
+            <tr><td>Créer un nouveau module</td><td><code>odoo-architect</code></td><td><code>odoo-module-scaffold</code></td></tr>
+            <tr><td>Diagnostiquer bug POS / stock</td><td><code>odoo-ops-diagnostic</code></td><td><code>odoo-ops-diagnostic</code></td></tr>
+            <tr><td>Déployer sur serveur</td><td><code>odoo-devops</code></td><td><code>odoo-devops-infra</code></td></tr>
+            <tr><td>Tester fonctionnellement</td><td><code>odoo-tester</code></td><td><code>odoo-functional-testing</code></td></tr>
+            <tr><td>Importer des données</td><td><code>odoo-data</code></td><td><code>odoo-data-migration</code></td></tr>
+            <tr><td>Nettoyer / refactorer du code</td><td><code>odoo-simplifier</code></td><td><code>odoo-code-simplifier</code></td></tr>
+            <tr><td>Revue de code</td><td><code>code-reviewer</code></td><td>—</td></tr>
+            <tr><td>Tâche complexe multi-domaine</td><td><code>sopromer-pilot</code></td><td>orchestrateur</td></tr>
+            <tr><td>Migration Sage → Odoo</td><td><code>odoo-sage-migrator</code></td><td><code>odoo-sage-migration</code></td></tr>
+            <tr><td>Automatisations n8n</td><td><code>n8n-automator</code></td><td><code>n8n-automation</code></td></tr>
+            <tr><td>Publication Apps Store</td><td><code>odoo-publisher</code></td><td><code>odoo-apps-store</code></td></tr>
+            <tr><td>Migration version Odoo</td><td><code>odoo-upgrader</code></td><td><code>odoo-version-upgrade</code></td></tr>
+            <tr><td>Validation qualité</td><td><code>odoo-qa</code></td><td><code>odoo-functional-testing</code></td></tr>
+            <tr><td>Manuels, docs, slides formation</td><td><code>odoo-doc-writer</code></td><td><code>odoo-documentation</code></td></tr>
+        </table>
+
+        <h3>Repo centralisé</h3>
+        <table>
+            <tr><th>Élément</th><th>Emplacement</th></tr>
+            <tr><td>Repo GitHub</td><td><code>Lalaina710/odoo-skills</code></td></tr>
+            <tr><td>Clone local</td><td><code>C:\Users\User\AppData\Local\Temp\odoo-skills</code></td></tr>
+            <tr><td>Agents actifs</td><td><code>~/.claude/agents/</code></td></tr>
+            <tr><td>Skills</td><td><code>odoo-skills/skills/</code> (17 skills)</td></tr>
+        </table>
+
+        <div class="info-box info">
+            <strong>Règle :</strong> Chaque agent DOIT invoquer son skill via l'outil <code>Skill</code> avant de commencer à coder. C'est imposé par CLAUDE.md.
+        </div>
+    </div>
+
+    <!-- 7. Puppeteer E2E -->
+    <div class="section" id="puppeteer">
+        <h2><span class="num">7</span> Tests E2E Puppeteer <span class="tag tag-new">nouveau</span></h2>
+
+        <p>Tests navigateur automatisés pour valider l'UI, les composants OWL/JS, le POS — tout ce que XML-RPC ne peut pas couvrir.</p>
+
+        <div class="info-box danger">
+            <strong>RESTRICTION ABSOLUE : Puppeteer = serveur 45 (test) UNIQUEMENT.</strong>
+            Jamais sur 43 (prod) ni odoo.sopromer.mg. Le <code>config.js</code> bloque automatiquement toute tentative vers la prod (process.exit(1)).
+        </div>
+
+        <h3>Quand utiliser Puppeteer vs XML-RPC</h3>
+        <table>
+            <tr><th>Besoin</th><th>Outil</th></tr>
+            <tr><td>UI, boutons custom, widgets JS/OWL</td><td style="color: var(--green); font-weight: 700;">Puppeteer</td></tr>
+            <tr><td>POS (caisse, paiement, ticket)</td><td style="color: var(--green); font-weight: 700;">Puppeteer (seul moyen)</td></tr>
+            <tr><td>Dashboards, rendu visuel</td><td style="color: var(--green); font-weight: 700;">Puppeteer</td></tr>
+            <tr><td>Data, workflows, calculs ORM</td><td style="color: var(--blue); font-weight: 700;">XML-RPC / Shell</td></tr>
+            <tr><td>Droits d'accès</td><td style="color: var(--blue); font-weight: 700;">XML-RPC</td></tr>
+        </table>
+
+        <h3>Headless vs Visuel — règle d'usage</h3>
+
+        <div class="flow">
+            <div class="flow-step">Dev / Debug</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step active">Mode Visuel<br><small>HEADLESS=false</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step" style="border-color: var(--green);">Tu vois Chrome<br>bouger en direct</div>
+        </div>
+        <div class="flow">
+            <div class="flow-step">Routine / Validation</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step active">Mode Headless<br><small>(défaut)</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step" style="border-color: var(--green);">Rapide, en fond<br>logs + screenshots</div>
+        </div>
+
+        <table>
+            <tr><th>Situation</th><th>Mode</th><th>Commande</th></tr>
+            <tr><td>Écrire un nouveau test</td><td><strong>Visuel + SLOW_MO</strong></td><td><code>HEADLESS=false SLOW_MO=100 node ...</code></td></tr>
+            <tr><td>Test échoue, debug</td><td><strong>Visuel</strong></td><td><code>HEADLESS=false node ...</code></td></tr>
+            <tr><td>Test validé, routine</td><td><strong>Headless</strong></td><td><code>node ...</code></td></tr>
+            <tr><td>Batch tous les modules</td><td><strong>Headless</strong></td><td><code>for f in puppeteer-tests/test-*.js; do node "$f"; done</code></td></tr>
+            <tr><td>Montrer un bug</td><td><strong>Visuel</strong></td><td>Voir le problème en direct</td></tr>
+            <tr><td>Tester POS première fois</td><td><strong>Visuel + SLOW_MO</strong></td><td>Beaucoup d'interactions UI</td></tr>
+        </table>
+
+        <div class="info-box tip">
+            <strong>Règle simple :</strong> Dev/debug → visuel. Routine/validation → headless.
+        </div>
+
+        <h3>Structure des fichiers</h3>
+<pre><code>puppeteer-tests/
+├── config.js          <span class="comment">← connexion + guard anti-prod</span>
+├── helpers.js         <span class="comment">← launch(), login(), navigateMenu(), screenshot()</span>
+├── test-module.js     <span class="comment">← smoke test générique</span>
+├── test-&lt;module&gt;.js   <span class="comment">← tests spécifiques par module</span>
+└── screenshots/       <span class="comment">← captures auto horodatées</span></code></pre>
+
+        <h3>Commandes</h3>
+<pre><code><span class="comment"># Smoke test d'un module (headless)</span>
+<span class="cmd">node</span> <span class="string">puppeteer-tests/test-module.js</span> <span class="flag">pos_dashboard</span> <span class="string">"Point de Vente"</span>
+
+<span class="comment"># Dev : visuel + ralenti</span>
+<span class="cmd">HEADLESS=false SLOW_MO=100</span> <span class="cmd">node</span> <span class="string">puppeteer-tests/test-pos.js</span>
+
+<span class="comment"># Batch (headless)</span>
+<span class="cmd">for</span> f <span class="cmd">in</span> <span class="string">puppeteer-tests/test-*.js</span>; <span class="cmd">do</span> node "$f"; <span class="cmd">done</span>
+
+<span class="comment"># npm scripts</span>
+<span class="cmd">npm test</span>                    <span class="comment"># headless</span>
+<span class="cmd">npm run test:live</span>           <span class="comment"># visuel</span>
+<span class="cmd">npm run test:slow</span>           <span class="comment"># visuel + ralenti</span></code></pre>
+
+        <h3>Agent concerné</h3>
+        <p>L'agent <code>odoo-tester</code> est configuré pour utiliser Puppeteer. Il choisit automatiquement le bon mode (visuel pour dev, headless pour routine).</p>
+
+        <h3>Sécurité config.js</h3>
+        <table>
+            <tr><th>Paramètre</th><th>Valeur</th></tr>
+            <tr><td>URL par défaut</td><td><code>http://192.73.0.45:8069</code></td></tr>
+            <tr><td>Hôtes autorisés</td><td><code>localhost</code>, <code>127.0.0.1</code>, <code>192.73.0.45</code></td></tr>
+            <tr><td>Hôtes bloqués</td><td><code>192.73.0.43</code>, <code>odoo.sopromer.mg</code></td></tr>
+            <tr><td>Si prod détecté</td><td><code>process.exit(1)</code> immédiat</td></tr>
+        </table>
+    </div>
+
+    <!-- 8. CI/CD -->
+    <div class="section" id="ci">
+        <h2><span class="num">8</span> Template CI/CD <span class="tag tag-manual">à copier</span></h2>
+
+        <p>Fichier GitHub Actions prêt à copier dans chaque module pour du lint automatique au push.</p>
+
+        <h3>Comment activer pour un module</h3>
+<pre><code><span class="comment"># Créer le dossier workflows dans le module</span>
+<span class="cmd">mkdir -p</span> <span class="string">pos_dashboard/.github/workflows</span>
+
+<span class="comment"># Copier le template</span>
+<span class="cmd">cp</span> <span class="string">scripts/ci-lint.yml</span> <span class="string">pos_dashboard/.github/workflows/lint.yml</span>
+
+<span class="comment"># Commit + push</span>
+<span class="cmd">cd</span> <span class="string">pos_dashboard</span>
+<span class="cmd">git add</span> <span class="string">.github/</span>
+<span class="cmd">git commit -m</span> <span class="string">"ci: add ruff lint workflow"</span>
+<span class="cmd">git push</span></code></pre>
+
+        <div class="info-box tip">
+            <strong>Après ça</strong>, chaque push sur GitHub lance automatiquement ruff lint + vérification du manifeste.
+        </div>
+
+        <h3>Ce que le workflow vérifie</h3>
+        <table>
+            <tr><th>Check</th><th>Description</th></tr>
+            <tr><td>ruff check</td><td>Lint Python avec format GitHub (annotations dans la PR)</td></tr>
+            <tr><td>Manifest version</td><td>Vérifie que <code>__manifest__.py</code> contient une version</td></tr>
+        </table>
+    </div>
+
+    <!-- 8. Versions -->
+    <div class="section" id="versions">
+        <h2><span class="num">9</span> Tracker de versions <span class="tag tag-auto">automatique</span></h2>
+
+        <p>Fichier JSON mis à jour automatiquement par <code>deploy.sh</code> à chaque déploiement.</p>
+
+        <h3>Emplacement</h3>
+        <p><code>scripts/deployed_versions.json</code></p>
+
+        <h3>Exemple après quelques déploiements</h3>
+<pre><code>{
+  <span class="string">"servers"</span>: {
+    <span class="string">"45"</span>: {
+      <span class="string">"name"</span>: <span class="string">"TEST"</span>,
+      <span class="string">"modules"</span>: {
+        <span class="string">"pos_dashboard"</span>: {
+          <span class="string">"version"</span>: <span class="string">"18.0.2.1.0"</span>,
+          <span class="string">"deployed_at"</span>: <span class="string">"2026-04-18 15:30"</span>,
+          <span class="string">"deployed_by"</span>: <span class="string">"User"</span>
+        }
+      }
+    },
+    <span class="string">"43"</span>: {
+      <span class="string">"name"</span>: <span class="string">"PROD"</span>,
+      <span class="string">"modules"</span>: {
+        <span class="string">"pos_dashboard"</span>: {
+          <span class="string">"version"</span>: <span class="string">"18.0.2.1.0"</span>,
+          <span class="string">"deployed_at"</span>: <span class="string">"2026-04-18 20:15"</span>,
+          <span class="string">"deployed_by"</span>: <span class="string">"User"</span>
+        }
+      }
+    }
+  }
+}</code></pre>
+
+        <h3>Consulter rapidement</h3>
+<pre><code><span class="comment"># Voir toutes les versions déployées</span>
+<span class="cmd">cat</span> <span class="string">scripts/deployed_versions.json</span>
+
+<span class="comment"># Voir l'historique chronologique</span>
+<span class="cmd">cat</span> <span class="string">scripts/deploy.log</span></code></pre>
+    </div>
+
+    <!-- 9. Mémoires -->
+    <div class="section" id="memoires">
+        <h2><span class="num">10</span> Mémoires Claude <span class="tag tag-auto">automatique</span></h2>
+
+        <p>18 fichiers mémoire qui persistent entre les sessions. Claude se souvient du contexte projet.</p>
+
+        <h3>Comment ça marche</h3>
+        <ol class="steps">
+            <li><strong>À chaque session</strong>, Claude charge <code>MEMORY.md</code> qui indexe toutes les mémoires</li>
+            <li><strong>Les mémoires</strong> contiennent : contexte serveurs, règles, modules installés, feedbacks</li>
+            <li><strong>7 mémoires obsolètes</strong> ont été supprimées = -26% input tokens</li>
+        </ol>
+
+        <h3>Ajouter une mémoire</h3>
+<pre><code><span class="comment"># Demande à Claude directement :</span>
+<span class="string">"Retiens que le module X a été déployé en prod le 18 avril"</span>
+<span class="string">"Retiens que la politique de facturation est sur delivery"</span>
+<span class="output">→ Claude crée un fichier mémoire automatiquement</span></code></pre>
+
+        <h3>Supprimer une mémoire</h3>
+<pre><code><span class="string">"Oublie la mémoire sur le monitoring stack"</span>
+<span class="output">→ Claude supprime le fichier et l'entrée dans MEMORY.md</span></code></pre>
+
+        <h3>Mémoires actives</h3>
+        <table>
+            <tr><th>Type</th><th>Contenu</th><th>Nombre</th></tr>
+            <tr><td>Projet</td><td>Déploiement, migration Sage, stock, lock_so, manuels</td><td>8</td></tr>
+            <tr><td>Référence</td><td>Serveurs, modules, GitHub, skills, sécurité PdV</td><td>5</td></tr>
+            <tr><td>Feedback</td><td>Pas restart prod, agent labels, screenshots path, db_name</td><td>5</td></tr>
+        </table>
+    </div>
+
+    <!-- 10. Workflow quotidien -->
+    <div class="section" id="workflow">
+        <h2><span class="num">11</span> Workflow quotidien</h2>
+
+        <h3>Journée type</h3>
+        <ol class="steps">
+            <li>
+                <strong>Ouvrir Claude Code</strong> dans <code>C:\odoo18\custom-addons\</code><br>
+                <small style="color: var(--text-light);">→ CLAUDE.md chargé, caveman actif, mémoires chargées — automatique</small>
+            </li>
+            <li>
+                <strong>Demander une tâche</strong><br>
+                <code>"Ajoute un champ date_livraison sur sale.order"</code><br>
+                <small style="color: var(--text-light);">→ Claude utilise odoo-backend, ruff lint auto sur chaque fichier modifié</small>
+            </li>
+            <li>
+                <strong>Déployer sur TEST</strong><br>
+                <code>./scripts/deploy.sh mon_module 45</code><br>
+                <small style="color: var(--text-light);">→ Copie + restart auto + log + versions tracker mis à jour</small>
+            </li>
+            <li>
+                <strong>Tester sur le serveur 45</strong><br>
+                <small style="color: var(--text-light);">→ Vérifier manuellement ou demander à odoo-tester</small>
+            </li>
+            <li>
+                <strong>Déployer sur PROD</strong> (quand validé)<br>
+                <code>./scripts/deploy.sh mon_module 43</code><br>
+                <small style="color: var(--text-light);">→ Copie seulement, pas de restart</small>
+            </li>
+            <li>
+                <strong>Le soir — restart PROD</strong><br>
+                <code>ssh odoo@192.73.0.43</code><br>
+                <code>docker restart odoo-dev</code><br>
+                <small style="color: var(--text-light);">→ Module actif le lendemain matin</small>
+            </li>
+            <li>
+                <strong>Vérifier en prod</strong> le lendemain<br>
+                <small style="color: var(--text-light);">→ Tester que tout fonctionne sur odoo.sopromer.mg</small>
+            </li>
+        </ol>
+
+        <h3>Flow complet</h3>
+        <div class="flow">
+            <div class="flow-step">Dev local<br><small>Claude Code</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">Push<br><small>GitHub</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">Deploy 45<br><small>deploy.sh</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">Test<br><small>validation</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">Deploy 43<br><small>deploy.sh</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step active">Restart soir<br><small>docker restart</small></div>
+        </div>
+
+        <div class="info-box warning">
+            <strong>Règles d'or</strong>
+            <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+                <li>Toujours tester sur 45 AVANT de déployer sur 43</li>
+                <li>JAMAIS de restart 43 pendant les heures de travail</li>
+                <li>Ne JAMAIS mettre <code>db_name</code> dans la config du serveur 45</li>
+                <li>Auditer avant toute manipulation destructive en prod</li>
+                <li>Chaque module = 1 repo GitHub avec README + .gitignore</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Arborescence fichiers -->
+    <div class="section">
+        <h2>Arborescence des fichiers créés / modifiés</h2>
+<pre><code>C:\odoo18\custom-addons\
+├── CLAUDE.md                          <span class="comment">← compressé (-18%)</span>
+├── CLAUDE.original.md                 <span class="comment">← backup</span>
+├── scripts/
+│   ├── deploy.sh                      <span class="comment">← déploiement 1 commande</span>
+│   ├── deploy.log                     <span class="comment">← historique (auto-rempli)</span>
+│   ├── deployed_versions.json         <span class="comment">← tracker versions (auto-rempli)</span>
+│   ├── ci-lint.yml                    <span class="comment">← template GitHub Actions</span>
+│   ├── change_uom_to_kg.sql
+│   └── archive/                       <span class="comment">← anciens scripts déplacés</span>
+│       ├── fix_all_dashboards_tz.py
+│       ├── fix_bc2600266.py
+│       ├── fix_date_filters_tz.py
+│       └── rapport_*.html
+├── puppeteer-tests/
+│   ├── config.js                      <span class="comment">← connexion + guard anti-prod</span>
+│   ├── helpers.js                     <span class="comment">← fonctions partagées</span>
+│   ├── test-module.js                 <span class="comment">← smoke test générique</span>
+│   └── screenshots/                   <span class="comment">← captures auto</span>
+├── package.json                       <span class="comment">← puppeteer + scripts npm</span>
+├── docs/
+│   └── guide-productivite-sopromer.html  <span class="comment">← ce guide</span>
+
+~/.claude/
+├── settings.json                      <span class="comment">← statusline + hook ruff</span>
+├── hooks/
+│   └── ruff-lint.py                   <span class="comment">← lint automatique</span>
+├── agents/
+│   └── sopromer-pilot.md              <span class="comment">← orchestrateur</span>
+
+odoo-skills/
+├── agents/
+│   └── sopromer-pilot.md              <span class="comment">← copie repo</span>
+└── skills/
+    └── sopromer-deploy/
+        └── SKILL.md                   <span class="comment">← skill déploiement</span></code></pre>
+    </div>
+
+</div>
+
+<div class="footer">
+    Guide Productivité SOPROMER — Généré le 18 avril 2026 par Claude Opus 4.6<br>
+    Projet Odoo 18 — GitHub: Lalaina710 — odoo.sopromer.mg
+</div>
+
+</body>
+</html>
