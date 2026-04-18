@@ -755,29 +755,62 @@ Mot de passe SSH: ********
 
         <p>Fichier GitHub Actions prêt à copier dans chaque module pour du lint automatique au push.</p>
 
+        <h3>Comment ça marche</h3>
+        <div class="flow">
+            <div class="flow-step">Tu fais<br><code>git push</code></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step active">GitHub lance<br>3 jobs en parallèle</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step" style="border-color: var(--green);">✓ OK → badge vert<br>✗ Erreur → annotations</div>
+        </div>
+
+        <h3>Ce que le workflow vérifie</h3>
+        <table>
+            <tr><th>Job</th><th>Check</th><th>Bloquant ?</th></tr>
+            <tr><td rowspan="2"><strong>Python Quality</strong></td><td>Ruff lint — erreurs de code Python</td><td class="bad">OUI</td></tr>
+            <tr><td>Ruff format — style de code Python (espaces, indentation)</td><td class="bad">OUI</td></tr>
+            <tr><td rowspan="4"><strong>Odoo Structure</strong></td><td>Manifeste — version format <code>18.0.X.Y.Z</code></td><td class="bad">OUI</td></tr>
+            <tr><td>Manifeste — license, author, depends présents</td><td class="warn">warning</td></tr>
+            <tr><td>XML valide — pas d'erreur de syntaxe dans les vues</td><td class="bad">OUI</td></tr>
+            <tr><td>Sécurité — <code>ir.model.access.csv</code> si nouveaux modèles</td><td class="warn">warning</td></tr>
+            <tr><td rowspan="2"><strong>Odoo Structure</strong> (suite)</td><td>Imports <code>__init__.py</code> — tous les .py importés</td><td class="bad">OUI</td></tr>
+            <tr><td>CSV header — format correct</td><td class="warn">warning</td></tr>
+            <tr><td rowspan="4"><strong>Repo Hygiene</strong></td><td>Pas de <code>__pycache__/</code> ou <code>.pyc</code> commités</td><td class="bad">OUI</td></tr>
+            <tr><td>Pas de fichiers secrets (<code>.env</code>, <code>.key</code>, <code>.pem</code>)</td><td class="bad">OUI</td></tr>
+            <tr><td><code>.gitignore</code> présent</td><td class="warn">warning</td></tr>
+            <tr><td><code>README.md</code> présent</td><td class="warn">warning</td></tr>
+        </table>
+
+        <div class="info-box info">
+            <strong>Bloquant vs Warning :</strong>
+            Un check <span class="bad">bloquant</span> fait échouer le CI (croix rouge ✗). Un <span class="warn">warning</span> affiche un avertissement mais ne bloque pas.
+        </div>
+
         <h3>Comment activer pour un module</h3>
 <pre><code><span class="comment"># Créer le dossier workflows dans le module</span>
 <span class="cmd">mkdir -p</span> <span class="string">pos_dashboard/.github/workflows</span>
 
 <span class="comment"># Copier le template</span>
-<span class="cmd">cp</span> <span class="string">scripts/ci-lint.yml</span> <span class="string">pos_dashboard/.github/workflows/lint.yml</span>
+<span class="cmd">cp</span> <span class="string">scripts/ci-lint.yml</span> <span class="string">pos_dashboard/.github/workflows/ci.yml</span>
 
 <span class="comment"># Commit + push</span>
 <span class="cmd">cd</span> <span class="string">pos_dashboard</span>
 <span class="cmd">git add</span> <span class="string">.github/</span>
-<span class="cmd">git commit -m</span> <span class="string">"ci: add ruff lint workflow"</span>
+<span class="cmd">git commit -m</span> <span class="string">"ci: add CI workflow — lint, structure, hygiene"</span>
 <span class="cmd">git push</span></code></pre>
 
         <div class="info-box tip">
-            <strong>Après ça</strong>, chaque push sur GitHub lance automatiquement ruff lint + vérification du manifeste.
+            <strong>Après ça</strong>, chaque push sur GitHub lance automatiquement les 3 jobs de vérification. Résultats visibles dans l'onglet <strong>Actions</strong> du repo.
         </div>
 
-        <h3>Ce que le workflow vérifie</h3>
-        <table>
-            <tr><th>Check</th><th>Description</th></tr>
-            <tr><td>ruff check</td><td>Lint Python avec format GitHub (annotations dans la PR)</td></tr>
-            <tr><td>Manifest version</td><td>Vérifie que <code>__manifest__.py</code> contient une version</td></tr>
-        </table>
+        <h3>Voir les résultats</h3>
+<pre><code><span class="comment"># Sur GitHub : repo → onglet Actions</span>
+<span class="output">✓ CI Odoo Module — main — 25s ago       ← tout OK</span>
+<span class="output">✗ CI Odoo Module — main — 5min ago      ← cliquer pour voir les erreurs</span>
+
+<span class="comment"># En CLI avec gh</span>
+<span class="cmd">gh run list</span>                              <span class="comment"># voir les derniers runs</span>
+<span class="cmd">gh run view</span> <span class="flag">--log-failed</span>                <span class="comment"># voir les erreurs du dernier run</span></code></pre>
     </div>
 
     <!-- 8. Versions -->
